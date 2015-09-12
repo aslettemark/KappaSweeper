@@ -25,15 +25,16 @@
 package net.aslettemark.kappasweeper;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class KappaGUI extends JFrame {
     private JButton resetButton;
     private JPanel rootPanel;
     private JPanel buttonPanel;
+    private JPanel infoPanel;
+    private JLabel infobox;
     public JButton[][] buttons;
     public static ImageIcon flag;
+    public static ImageIcon kappa;
 
     public KappaGUI() {
         super("KappaSweeper");
@@ -42,21 +43,20 @@ public class KappaGUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 500);
         this.setResizable(false);
-        this.flag = new ImageIcon("src/resources/flag.png");
 
-        resetButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("time to reset hue");
-            }
-        });
+        this.setInfoBox();
+
+        this.flag = new ImageIcon("src/resources/flag.png");
+        this.kappa = new ImageIcon("src/resources/kappa.png");
+
+        resetButton.addActionListener(new ResetListener(this));
 
         this.setVisible(true);
     }
 
     public void createButtons() {
-        final int sizeX = KappaSweeper.grid.sizeX;
-        final int sizeY = KappaSweeper.grid.sizeY;
+        int sizeX = KappaSweeper.grid.sizeX;
+        int sizeY = KappaSweeper.grid.sizeY;
         this.buttons = new JButton[sizeX][sizeY];
         int height = (this.buttonPanel.getSize().height - 20) / sizeY;
         int width = (this.buttonPanel.getSize().width - 20) / sizeX;
@@ -67,37 +67,76 @@ public class KappaGUI extends JFrame {
                 int xd = 10 + width * x;
                 int yd = 10 + height * y;
                 buttons[x][y].setBounds(xd, yd, width, height);
-                buttons[x][y].addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JButton btn = (JButton) e.getSource();
-                        for (int x = 0; x < sizeX; x++) {
-                            for (int y = 0; y < sizeY; y++) {
-                                if (btn == buttons[x][y]) {
-                                    final Cell cell = KappaSweeper.grid.grid[x][y];
-                                    cell.setExposed(true);
-                                    btn.setText(String.valueOf(cell.getLetter()));
-                                    btn.setEnabled(false);
-                                    if (cell.isMine()) {
-                                        //TODO game lost
-                                        System.out.println("You lost.");
-                                    } else if (KappaSweeper.grid.mines == KappaSweeper.grid.unTurnedTiles()) {
-                                        //TODO game won
-                                        System.out.println("You won.");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                buttons[x][y].addActionListener(new ClickListener(this));
                 buttons[x][y].addMouseListener(new FlagListener());
                 this.buttonPanel.add(buttons[x][y]);
             }
         }
+        this.setEnableGameButtons(true);
+    }
+
+    public void gameWon() {
+        this.setEnableGameButtons(false);
+        this.exposeAll(true);
+        this.infobox.setText("You won!");
+    }
+
+    public void gameLost() {
+        this.setEnableGameButtons(false);
+        this.exposeAll(true);
+        this.infobox.setText("You lost.");
+    }
+
+    public void exposeAll(boolean state) {
+        int sizeX = KappaSweeper.grid.sizeX;
+        int sizeY = KappaSweeper.grid.sizeY;
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                Cell cell = KappaSweeper.grid.grid[x][y];
+                cell.setExposed(state);
+                if(state) {
+                    if (cell.getLetter() == 'X') {
+                        buttons[x][y].setIcon(this.kappa);
+                    } else {
+                        buttons[x][y].setText(String.valueOf(cell.getLetter()));
+                    }
+                } else {
+                    buttons[x][y].setText("");
+                }
+            }
+        }
+    }
+
+    public void clearFlags() {
+        int sizeX = KappaSweeper.grid.sizeX;
+        int sizeY = KappaSweeper.grid.sizeY;
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                KappaSweeper.grid.grid[x][y].setFlagged(false);
+                this.buttons[x][y].setIcon(null);
+            }
+        }
+    }
+
+    public void setEnableGameButtons(boolean state) {
+        for(JButton[] btn : buttons) {
+            for(JButton b : btn) {
+                b.setEnabled(state);
+            }
+        }
+    }
+
+    public void setInfoBox() {
+        this.setInfoBox("GRID: " + KappaSweeper.grid.sizeX + "x" + KappaSweeper.grid.sizeY + " Mines: " + KappaSweeper.grid.mines);
+    }
+
+    public void setInfoBox(String info) {
+        this.infobox.setText(info);
     }
 
     private void createUIComponents() {
         this.buttonPanel = new JPanel();
         this.buttonPanel.setLayout(null);
+        this.infoPanel = new JPanel();
     }
 }
