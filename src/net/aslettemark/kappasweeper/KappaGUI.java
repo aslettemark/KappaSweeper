@@ -33,6 +33,7 @@ public class KappaGUI extends JFrame {
     private JPanel rootPanel;
     private JPanel buttonPanel;
     public JButton[][] buttons;
+    public static ImageIcon flag;
 
     public KappaGUI() {
         super("KappaSweeper");
@@ -41,6 +42,7 @@ public class KappaGUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 500);
         this.setResizable(false);
+        this.flag = new ImageIcon("src/resources/flag.png");
 
         resetButton.addActionListener(new ActionListener() {
             @Override
@@ -88,6 +90,7 @@ public class KappaGUI extends JFrame {
                         }
                     }
                 });
+                buttons[x][y].addMouseListener(new FlagListener());
                 this.buttonPanel.add(buttons[x][y]);
             }
         }
