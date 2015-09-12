@@ -32,7 +32,7 @@ public class KappaSweeper {
     public static KappaGUI gui;
 
     public static void main(String[] args) {
-        grid = new Grid(5, 5, 1232013, 1);
+        grid = new Grid(5, 5, 1232013, 5);
         grid.print();
 
         gui = new KappaGUI();

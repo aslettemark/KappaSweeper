@@ -31,7 +31,7 @@ public class Grid {
     public int sizeX;
     public int sizeY;
     private Random random;
-    private int mines;
+    public int mines;
     public Cell[][] grid;
 
     public Grid(int sizeX, int sizeY, long seed, int mines) {
@@ -87,6 +87,9 @@ public class Grid {
                         if (this.grid[x][y+1].isMine()) count++;
                     }
                     this.grid[x][y].setLetter((char) ('0' + count));
+                    if(count == 0) {
+                        this.grid[x][y].setLetter(' ');
+                    }
                 }
             }
         }
@@ -105,5 +108,17 @@ public class Grid {
             }
             System.out.println(line);
         }
+    }
+
+    public int unTurnedTiles() {
+        int count = 0;
+        for(int x = 0; x < this.sizeX; x++) {
+            for (int y = 0; y < this.sizeY; y++) {
+                if(KappaSweeper.gui.buttons[x][y].isEnabled()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

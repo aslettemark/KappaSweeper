@@ -53,11 +53,12 @@ public class KappaGUI extends JFrame {
     }
 
     public void createButtons() {
-        int sizeX = KappaSweeper.grid.sizeX;
-        int sizeY = KappaSweeper.grid.sizeY;
+        final int sizeX = KappaSweeper.grid.sizeX;
+        final int sizeY = KappaSweeper.grid.sizeY;
         this.buttons = new JButton[sizeX][sizeY];
         int height = (this.buttonPanel.getSize().height - 20) / sizeY;
         int width = (this.buttonPanel.getSize().width - 20) / sizeX;
+
         for(int y = 0; y < sizeY; y++) {
             for(int x = 0; x < sizeX; x++) {
                 buttons[x][y] = new JButton();
@@ -67,7 +68,24 @@ public class KappaGUI extends JFrame {
                 buttons[x][y].addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        System.out.println("ayy lmao");
+                        JButton btn = (JButton) e.getSource();
+                        for (int x = 0; x < sizeX; x++) {
+                            for (int y = 0; y < sizeY; y++) {
+                                if (btn == buttons[x][y]) {
+                                    final Cell cell = KappaSweeper.grid.grid[x][y];
+                                    cell.setExposed(true);
+                                    btn.setText(String.valueOf(cell.getLetter()));
+                                    btn.setEnabled(false);
+                                    if (cell.isMine()) {
+                                        //TODO game lost
+                                        System.out.println("You lost.");
+                                    } else if (KappaSweeper.grid.mines == KappaSweeper.grid.unTurnedTiles()) {
+                                        //TODO game won
+                                        System.out.println("You won.");
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
                 this.buttonPanel.add(buttons[x][y]);
