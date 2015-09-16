@@ -73,6 +73,7 @@ public class KappaGUI extends JFrame {
             }
         }
         this.setEnableGameButtons(true);
+        this.repaint();
     }
 
     public void gameWon() {
